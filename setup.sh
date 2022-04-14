@@ -53,27 +53,31 @@ USERNAME=`whoami`
 # Installing p10k
 p10k_user() {
     info "Installing p10k..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 
+    if [ ! -d ~/powerlevel10k ]; then
+      git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    else 
+      warn "~/powerlevel10k already exists"
+    fi
 }
 
 p10k_root() {
-    sudo su
+    if [ -d /root/powerlevel10k ]; then
+      warn "/root/powerlevel10k already exists --> deleting it..."
+      sudo rm -rf /root/powerlevel10k
+    fi
 
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    sudo ln -sfv $HOME/powerlevel10k /root/
+    sudo ln -sfv $HOME/.p10k.zsh /root/.p10k.zsh
+    sudo ln -sfv $HOME/.zshrc /root/.zshrc
 
-    ln -sfv $HOME/.p10k.zsh /root/.p10k.zsh
-    ln -sfv $HOME/.zshrc /root/.zshrc
-
-    usermod --shell /usr/bin/zsh root
-    usermod --shell /usr/bin/zsh $USERNAME
+    sudo usermod --shell /usr/bin/zsh root
+    sudo usermod --shell /usr/bin/zsh $USERNAME
 }
 
 # Linking dotfiles
 user_config() {
     info "Setting up..."
-
-    su $USERNAME
 
     ln -sfv $HOME/$REPO/.zshrc $HOME/.zshrc
     ln -sfv $HOME/$REPO/.p10k.zsh $HOME/.p10k.zsh
@@ -82,52 +86,75 @@ user_config() {
 useful_apps() {
     info "Installing usefull plugins/apps..."
 
+    # scrub (deleting files)
     sudo apt update
     sudo apt install scrub
 
     # zsh-autosuggestions
-    git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+    if [ ! -d /usr/share/zsh-autosuggestions ]; then
+      sudo git clone https://github.com/zsh-users/zsh-autosuggestions /usr/share/zsh-autosuggestions
+    else 
+      warn "~/.zsh/zsh-autosuggestions already exists"
+    fi
 
     # zsh-syntax-highlighting
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+    if [ ! -d /usr/share/zsh-syntax-highlighting ]; then
+      sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git /usr/share/zsh-syntax-highlighting
+    else 
+      warn "~/.zsh/zsh-syntax-highlighting already exists"
+    fi
 
     # zsh-autocomplete
-    git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete
+    if [ ! -d /usr/share/zsh-autocomplete ]; then
+      sudo git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git /usr/share/zsh-autocomplete
+    else 
+      warn "~/.zsh/zsh-autocomplete already exists"
+    fi
 
     # sudo plugin
-    cd $HOME/.zsh/
-    wget https://raw.githubusercontent.com/triplepointfive/oh-my-zsh/master/plugins/sudo/sudo.plugin.zsh
-    cd $ACTUAL_DIR
+    if [ ! -f /usr/share/sudo.plugin.zsh ]; then
+      cd /usr/share/
+      sudo wget https://raw.githubusercontent.com/triplepointfive/oh-my-zsh/master/plugins/sudo/sudo.plugin.zsh
+      cd $ACTUAL_DIR
+    else 
+      warn "~/.zsh/sudo.plugin.zsh already exists"
+    fi
 
     # bat (cat with wings)
-    sudo apt install bat
+    if ! program_exists bat; then
+      wget https://github.com/sharkdp/bat/releases/download/v0.20.0/bat_0.20.0_amd64.deb
+      sudo dpkg -i bat_0.20.0_amd64.deb
+      rm bat_0.20.0_amd64.deb
+    else 
+      warn "bat already exists"
+    fi
 
     # lsd
-    wget https://github.com/Peltoche/lsd/releases/download/0.21.0/lsd_0.21.0_amd64.deb
-    sudo dpkg -i lsd_0.21.0_amd64.deb
-    rm -rf lsd_0.21.0_amd64.deb
+    if ! program_exists lsd; then
+      wget https://github.com/Peltoche/lsd/releases/download/0.21.0/lsd_0.21.0_amd64.deb
+      sudo dpkg -i lsd_0.21.0_amd64.deb
+      rm lsd_0.21.0_amd64.deb
+    else 
+      warn "lsd already exists"
+    fi
 
     # fzf (fuzzy finder)
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install
+    if [ ! -d ~/.fzf ]; then
+      git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+      ~/.fzf/install
+    else
+      warn "~/.fzf already exists"
+    fi
 }
 
 shell_setup() {
     p10k_user
     p10k_root
-    shell_config
+    user_config
     useful_apps
 }
 
 main() {
-    if [ ! -d $TEMP_DIR ]; then
-        mkdir $TEMP_DIR
-    fi
-
-    if [ ! -d $CONFIG_DIR ]; then
-        mkdir $CONFIG_DIR
-    fi
-
     ok "Welcome to @hugoogb $REPO!!!"
     info "Starting process..."
 

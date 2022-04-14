@@ -32,8 +32,6 @@ function rot13()
 # Jobs: suggest files / foldername / histsory bellow the prompt
 # Requires: zsh-autosuggestions (packaging by Debian Team)
 # Jobs: Fish-like suggestion for command history
-# source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source /usr/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 # Select all suggestion instead of top on result only
 zstyle ':autocomplete:tab:*' insert-unambiguous yes
 zstyle ':autocomplete:tab:*' widget-style menu-select
@@ -44,16 +42,13 @@ bindkey $key[Down] down-line-or-history
  
 ##################################################
 # Fish like syntax highlighting
- 
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh	
- 
-source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh	
+source /usr/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+source /usr/share/sudo.plugin.zsh
+
 skip_global_compinit=1
-
-source ~/.zsh/sudo.plugin.zsh
-
  
 # Save type history for completion and easier life
 HISTFILE=~/.zsh_history
@@ -83,13 +78,19 @@ alias l='lsd --group-dirs=first'
 alias lla='lsd -lha --group-dirs=first'
 alias ls='lsd --group-dirs=first'
  
-alias cat='/bin/bat'
+alias bat='batcat'
+alias cat='batcat'
 alias catn='/bin/cat'
-alias catnl='/bin/bat --paging=never'
+alias catnl='batcat --paging=never'
  
 alias ..='cd ..'
  
 alias reload='source $HOME/.zshrc'
+
+alias :q='exit'
+alias :wq='exit'
+
+alias ghk='cat ~/.github-Pat'
  
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
  
@@ -163,6 +164,8 @@ zle -N zle-keymap-select
  
 # Start with beam shape cursor on zsh startup and after every command.
 zle-line-init() { zle-keymap-select 'beam'}
+
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
  
 # Finalize Powerlevel10k instant prompt. Should stay at the bottom of ~/.zshrc.
 (( ! ${+functions[p10k-instant-prompt-finalize]} )) || p10k-instant-prompt-finalize
