@@ -90,8 +90,8 @@ alias :q='exit'
 alias :wq='exit'
 
 alias ghk='cat ~/.github-Pat'
-alias ghkc='catn ~/.github-Pat | head -3  | tail -1 | clip.exe'
-alias ghkc2='catn ~/.github-Pat | head -8  | tail -1 | clip.exe'
+alias ghkc='catn ~/.github-Pat | head -3  | tail -1 | tr -d "\n" | clip.exe'
+alias ghkc2='catn ~/.github-Pat | head -8  | tail -1 | tr -d "\n" | clip.exe'
  
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
  
